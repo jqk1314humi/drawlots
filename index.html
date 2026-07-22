@@ -348,11 +348,57 @@
                     await deleteRecords(batch);
                     await new Promise(resolve => setTimeout(resolve, 300));
                 }
+                
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                await createMatchRecords(matches);
             } catch (error) {
                 console.error(error);
                 statusEl.textContent = `抽签失败: ${error.message}`;
                 statusEl.className = 'status-text error';
             }
+        }
+
+        async function createMatchRecords(matchesList) {
+            const statusEl = document.getElementById('status');
+            const TOKEN = "uskNUrvWvJoD3VuQ5zW7GYH";
+            const DATASHEET_ID = "dstgE4eYXvlwZxf4zU";
+            
+            statusEl.textContent = '正在保存赛程结果...';
+            
+            const recordsToCreate = matchesList.filter(m => m.teamA || m.teamB).map((m, index) => ({
+                fields: {
+                    matchOrder: index + 1,
+                    teamA: m.teamA || '',
+                    teamB: m.teamB || ''
+                }
+            }));
+            
+            const batchSize = 10;
+            for (let i = 0; i < recordsToCreate.length; i += batchSize) {
+                const batch = recordsToCreate.slice(i, Math.min(i + batchSize, recordsToCreate.length));
+                
+                try {
+                    const url = `https://api.vika.cn/fusion/v1/datasheets/${DATASHEET_ID}/records`;
+                    const response = await fetch(url, {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${TOKEN}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ records: batch })
+                    });
+                    
+                    const result = await response.json();
+                    console.log('创建记录响应:', result);
+                } catch (error) {
+                    console.error('创建记录异常:', error);
+                }
+                
+                await new Promise(resolve => setTimeout(resolve, 500));
+            }
+            
+            statusEl.textContent = '赛程已保存到维格表！';
+            statusEl.className = 'status-text success';
         }
 
         window.onload = loadRecords;
