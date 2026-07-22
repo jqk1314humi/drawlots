@@ -21,7 +21,7 @@
             background-position: center;
             background-repeat: no-repeat;
             padding: 20px;
-            padding-top: 18vh;
+            padding-top: 10vh;
         }
         .container {
             background: rgba(255, 215, 0, 0.2);
@@ -31,7 +31,7 @@
             box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
             border: 2px solid rgba(255, 215, 0, 0.5);
             text-align: center;
-            max-width: 400px;
+            max-width: 500px;
             width: 100%;
             animation: fadeInUp 0.6s ease-out;
         }
@@ -53,35 +53,68 @@
             font-weight: 700;
             letter-spacing: -0.5px;
         }
-        .code-display {
-            background: rgba(0, 0, 0, 0.95);
-            border: 2px solid rgba(255, 215, 0, 0.5);
+        .matches-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            max-height: 400px;
+            overflow-y: auto;
+            padding-right: 5px;
+            margin-bottom: 25px;
+        }
+        .matches-grid::-webkit-scrollbar {
+            width: 4px;
+        }
+        .matches-grid::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 2px;
+        }
+        .matches-grid::-webkit-scrollbar-thumb {
+            background: rgba(255, 215, 0, 0.5);
+            border-radius: 2px;
+        }
+        .match-box {
+            background: rgba(0, 0, 0, 0.9);
+            border: 2px solid rgba(255, 215, 0, 0.3);
             border-radius: 10px;
-            padding: 15px 15px;
-            margin: 20px 0;
-            font-size: 24px;
-            font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+            padding: 12px;
+            transition: all 0.3s ease;
+        }
+        .match-box.filled {
+            border-color: rgba(255, 215, 0, 0.8);
+            box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+        }
+        .match-header {
+            font-size: 12px;
+            color: rgba(255, 215, 0, 0.6);
+            margin-bottom: 8px;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+        .match-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+        }
+        .team-name {
+            font-size: 18px;
             color: #ffd700;
-            min-height: 60px;
+            font-weight: 600;
+            min-height: 24px;
             display: flex;
             align-items: center;
             justify-content: center;
-            word-break: break-all;
-            position: relative;
-            overflow: hidden;
         }
-        .code-display::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
-            transition: left 0.5s;
+        .vs {
+            font-size: 12px;
+            color: rgba(255, 215, 0, 0.5);
+            font-weight: 700;
+            letter-spacing: 2px;
         }
-        .code-display.has-code::before {
-            left: 100%;
+        .team-name.empty {
+            color: rgba(255, 215, 0, 0.2);
+            font-style: italic;
         }
         .button-group {
             display: flex;
@@ -115,19 +148,8 @@
             cursor: not-allowed;
             transform: none;
         }
-        button.secondary {
-            background: rgba(0, 0, 0, 0.5);
-            color: #ffd700;
-            border: 2px solid #ffd700;
-            box-shadow: none;
-        }
-        button.secondary:hover {
-            background: rgba(255, 215, 0, 0.2);
-            color: #ffd700;
-            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
-        }
         .status {
-            margin-top: 30px;
+            margin-top: 20px;
             font-size: 14px;
             padding: 12px 20px;
             border-radius: 8px;
@@ -149,18 +171,20 @@
 <body>
     <div class="container">
         <h1>寒江演武32进16抽签</h1>
-        <div class="code-display" id="codeDisplay">点击下方按钮抽签</div>
+        <div class="matches-grid" id="matchesGrid"></div>
         <div class="button-group">
-            <button id="generateBtn" onclick="generateCode()" disabled>随机抽签</button>
+            <button id="generateBtn" onclick="drawMatches()" disabled>开始抽签</button>
         </div>
         <div class="status" id="status"></div>
     </div>
 
     <script>
         let allRecords = [];
+        let matches = [];
         const API_TOKEN = "uskNUrvWvJoD3VuQ5zW7GYH";
         const DATASHEET_ID = "dstkLYv4iqNWmnWAkz";
         const VIEW_ID = "viwilzoq1fHp3";
+        const TOTAL_MATCHES = 20;
 
         async function loadRecords() {
             const statusEl = document.getElementById('status');
@@ -182,12 +206,13 @@
                 
                 if (result.success) {
                     allRecords = result.data.records;
-                    statusEl.textContent = `还剩余${allRecords.length} 个签`;
+                    initMatches();
+                    statusEl.textContent = `已加载 ${allRecords.length} 个参赛选手，共 ${TOTAL_MATCHES} 场比赛`;
                     statusEl.className = 'status success';
-                    if (allRecords.length > 0) {
+                    if (allRecords.length >= 2) {
                         btnEl.disabled = false;
                     } else {
-                        statusEl.textContent = '抽签已结束';
+                        statusEl.textContent = '参赛选手不足，无法抽签';
                         statusEl.className = 'status error';
                     }
                 } else {
@@ -200,58 +225,125 @@
             }
         }
 
-        async function generateCode() {
-            const codeDisplay = document.getElementById('codeDisplay');
-            const statusEl = document.getElementById('status');
-            const btnEl = document.getElementById('generateBtn');
+        function initMatches() {
+            matches = [];
+            const grid = document.getElementById('matchesGrid');
+            grid.innerHTML = '';
             
-            if (allRecords.length === 0) {
-                statusEl.textContent = '抽签已结束';
+            for (let i = 1; i <= TOTAL_MATCHES; i++) {
+                matches.push({
+                    id: i,
+                    teamA: null,
+                    teamB: null,
+                    teamARecordId: null,
+                    teamBRecordId: null
+                });
+                
+                const box = document.createElement('div');
+                box.className = 'match-box';
+                box.id = `match-${i}`;
+                box.innerHTML = `
+                    <div class="match-header">第 ${i} 场</div>
+                    <div class="match-content">
+                        <div class="team-name empty">等待抽签</div>
+                        <div class="vs">VS</div>
+                        <div class="team-name empty">等待抽签</div>
+                    </div>
+                `;
+                grid.appendChild(box);
+            }
+        }
+
+        function shuffleArray(array) {
+            const newArray = [...array];
+            for (let i = newArray.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+            }
+            return newArray;
+        }
+
+        async function deleteRecords(recordIds) {
+            if (recordIds.length === 0) return true;
+            
+            try {
+                const url = `https://api.vika.cn/fusion/v1/datasheets/${DATASHEET_ID}/records`;
+                const response = await fetch(url, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${API_TOKEN}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ recordIds })
+                });
+                
+                const result = await response.json();
+                return result.success;
+            } catch (error) {
+                console.error('删除失败:', error);
+                return false;
+            }
+        }
+
+        async function drawMatches() {
+            const btnEl = document.getElementById('generateBtn');
+            const statusEl = document.getElementById('status');
+            
+            btnEl.disabled = true;
+            statusEl.textContent = '正在抽签，请稍候...';
+            statusEl.className = 'status';
+            
+            if (allRecords.length < 2) {
+                statusEl.textContent = '参赛选手不足，无法抽签';
                 statusEl.className = 'status error';
                 return;
             }
             
-            btnEl.disabled = true;
-            
-            const randomIndex = Math.floor(Math.random() * allRecords.length);
-            const randomRecord = allRecords[randomIndex];
-            const authCode = randomRecord.fields['order'];
-            const recordId = randomRecord.recordId;
-            
-            codeDisplay.classList.remove('has-code');
-            setTimeout(() => {
-                codeDisplay.textContent = authCode || '抽签已结束';
-                codeDisplay.classList.add('has-code');
-            }, 50);
-            
-            statusEl.textContent = '您已抽签结束，请等待抽签结果';
-            statusEl.className = 'status';
-            
             try {
-                const url = `https://api.vika.cn/fusion/v1/datasheets/${DATASHEET_ID}/records?recordIds[]=${recordId}`;
-                const response = await fetch(url, {
-                    method: 'DELETE',
-                    headers: {
-                        'Authorization': `Bearer ${API_TOKEN}`
+                const shuffledRecords = shuffleArray(allRecords);
+                const recordsToDelete = [];
+                
+                for (let i = 0; i < TOTAL_MATCHES && i * 2 + 1 < shuffledRecords.length; i++) {
+                    const recordA = shuffledRecords[i * 2];
+                    const recordB = shuffledRecords[i * 2 + 1];
+                    
+                    matches[i].teamA = recordA.fields['order'];
+                    matches[i].teamB = recordB.fields['order'];
+                    matches[i].teamARecordId = recordA.recordId;
+                    matches[i].teamBRecordId = recordB.recordId;
+                    
+                    recordsToDelete.push(recordA.recordId, recordB.recordId);
+                    
+                    const box = document.getElementById(`match-${i + 1}`);
+                    if (box) {
+                        box.className = 'match-box filled';
+                        const content = box.querySelector('.match-content');
+                        content.innerHTML = `
+                            <div class="team-name">${matches[i].teamA || '未知'}</div>
+                            <div class="vs">VS</div>
+                            <div class="team-name">${matches[i].teamB || '未知'}</div>
+                        `;
                     }
-                });
+                    
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                }
                 
-                const result = await response.json();
+                statusEl.textContent = '抽签完成，正在删除已抽取选手...';
                 
-                if (result.success) {
-                    allRecords.splice(randomIndex, 1);
-                    statusEl.textContent = `您已抽签结束，请等待抽签结果，剩余 ${allRecords.length} 个签`;
+                const deleteSuccess = await deleteRecords(recordsToDelete);
+                
+                if (deleteSuccess) {
+                    allRecords = allRecords.filter(r => !recordsToDelete.includes(r.recordId));
+                    const filledCount = matches.filter(m => m.teamA && m.teamB).length;
+                    statusEl.textContent = `抽签完成！共生成 ${filledCount} 场比赛，剩余 ${allRecords.length} 个选手`;
                     statusEl.className = 'status success';
-                    if (allRecords.length === 0) {
-                        statusEl.textContent = '抽签已结束';
-                        statusEl.className = 'status error';
-                    }
                 } else {
-                    throw new Error(result.message || '删除失败');
+                    statusEl.textContent = '抽签完成，但删除记录失败，请手动处理';
+                    statusEl.className = 'status error';
                 }
             } catch (error) {
                 console.error(error);
-                statusEl.textContent = `删除失败: ${error.message}`;
+                statusEl.textContent = `抽签失败: ${error.message}`;
                 statusEl.className = 'status error';
             }
         }
