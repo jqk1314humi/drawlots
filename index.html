@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>寒江演武32进16抽签系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-image: url('微信图片_20260722115841_33385_1534.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            padding: 20px;
+        }
+        .container {
+            background: rgba(255, 215, 0, 0.2);
+            backdrop-filter: blur(5px);
+            padding: 50px 40px;
+            border-radius: 20px;
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.3);
+            border: 2px solid rgba(255, 215, 0, 0.5);
+            text-align: center;
+            max-width: 600px;
+            width: 100%;
+            animation: fadeInUp 0.6s ease-out;
+        }
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        h1 {
+            color: #ffd700;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+            margin-bottom: 40px;
+            font-size: 32px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+        .code-display {
+            background: rgba(0, 0, 0, 0.5);
+            border: 2px solid rgba(255, 215, 0, 0.5);
+            border-radius: 12px;
+            padding: 40px 30px;
+            margin: 30px 0;
+            font-size: 32px;
+            font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+            color: #ffd700;
+            min-height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            word-break: break-all;
+            position: relative;
+            overflow: hidden;
+        }
+        .code-display::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            transition: left 0.5s;
+        }
+        .code-display.has-code::before {
+            left: 100%;
+        }
+        .button-group {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        button {
+            background: linear-gradient(135deg, #ffd700 0%, #daa520 100%);
+            color: #1a1a1a;
+            border: none;
+            padding: 16px 45px;
+            font-size: 16px;
+            font-weight: 600;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
+            letter-spacing: 0.5px;
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 215, 0, 0.5);
+        }
+        button:active {
+            transform: translateY(0);
+        }
+        button:disabled {
+            background: linear-gradient(135deg, #a0aec0 0%, #718096 100%);
+            box-shadow: none;
+            cursor: not-allowed;
+            transform: none;
+        }
+        button.secondary {
+            background: rgba(0, 0, 0, 0.5);
+            color: #ffd700;
+            border: 2px solid #ffd700;
+            box-shadow: none;
+        }
+        button.secondary:hover {
+            background: rgba(255, 215, 0, 0.2);
+            color: #ffd700;
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+        }
+        .status {
+            margin-top: 30px;
+            font-size: 14px;
+            padding: 12px 20px;
+            border-radius: 8px;
+            display: inline-block;
+            min-width: 200px;
+        }
+        .error {
+            background-color: #fff5f5;
+            color: #c53030;
+            border: 1px solid #feb2b2;
+        }
+        .success {
+            background-color: #f0fff4;
+            color: #276749;
+            border: 1px solid #9ae6b4;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>寒江演武32进16抽签</h1>
+        <div class="code-display" id="codeDisplay">点击下方按钮抽签</div>
+        <div class="button-group">
+            <button id="generateBtn" onclick="generateCode()" disabled>随机抽签</button>
+            <button class="secondary" onclick="loadRecords()">重新加载</button>
+        </div>
+        <div class="status" id="status"></div>
+    </div>
+
+    <script>
+        let allRecords = [];
+        const API_TOKEN = "uskNUrvWvJoD3VuQ5zW7GYH";
+        const DATASHEET_ID = "dstkLYv4iqNWmnWAkz";
+        const VIEW_ID = "viwilzoq1fHp3";
+
+        async function loadRecords() {
+            const statusEl = document.getElementById('status');
+            const btnEl = document.getElementById('generateBtn');
+            statusEl.textContent = '正在加载数据...';
+            btnEl.disabled = true;
+            
+            try {
+                const url = `https://api.vika.cn/fusion/v1/datasheets/${DATASHEET_ID}/records?viewId=${VIEW_ID}&pageSize=1000`;
+                const response = await fetch(url, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${API_TOKEN}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    allRecords = result.data.records;
+                    statusEl.textContent = `还剩余${allRecords.length} 个签`;
+                    statusEl.className = 'status success';
+                    if (allRecords.length > 0) {
+                        btnEl.disabled = false;
+                    } else {
+                        statusEl.textContent = '抽签已结束';
+                        statusEl.className = 'status error';
+                    }
+                } else {
+                    throw new Error(result.message || '请求失败');
+                }
+            } catch (error) {
+                console.error(error);
+                statusEl.textContent = `加载失败: ${error.message}`;
+                statusEl.className = 'status error';
+            }
+        }
+
+        async function generateCode() {
+            const codeDisplay = document.getElementById('codeDisplay');
+            const statusEl = document.getElementById('status');
+            const btnEl = document.getElementById('generateBtn');
+            
+            if (allRecords.length === 0) {
+                statusEl.textContent = '抽签已结束';
+                statusEl.className = 'status error';
+                return;
+            }
+            
+            btnEl.disabled = true;
+            
+            const randomIndex = Math.floor(Math.random() * allRecords.length);
+            const randomRecord = allRecords[randomIndex];
+            const authCode = randomRecord.fields['order'];
+            const recordId = randomRecord.recordId;
+            
+            codeDisplay.classList.remove('has-code');
+            setTimeout(() => {
+                codeDisplay.textContent = authCode || '抽签已结束';
+                codeDisplay.classList.add('has-code');
+            }, 50);
+            
+            statusEl.textContent = '正在删除记录...';
+            statusEl.className = 'status';
+            
+            try {
+                const url = `https://api.vika.cn/fusion/v1/datasheets/${DATASHEET_ID}/records?recordIds[]=${recordId}`;
+                const response = await fetch(url, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${API_TOKEN}`
+                    }
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    allRecords.splice(randomIndex, 1);
+                    statusEl.textContent = `已删除，剩余 ${allRecords.length} 个签`;
+                    statusEl.className = 'status success';
+                    if (allRecords.length === 0) {
+                        statusEl.textContent = '抽签已结束';
+                        statusEl.className = 'status error';
+                    }
+                } else {
+                    throw new Error(result.message || '删除失败');
+                }
+            } catch (error) {
+                console.error(error);
+                statusEl.textContent = `删除失败: ${error.message}`;
+                statusEl.className = 'status error';
+            } finally {
+                if (allRecords.length > 0) {
+                    btnEl.disabled = false;
+                }
+            }
+        }
+
+        window.onload = loadRecords;
+    </script>
+</body>
+</html>
