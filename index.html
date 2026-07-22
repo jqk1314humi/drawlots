@@ -367,9 +367,7 @@
             
             const recordsToCreate = matchesList.filter(m => m.teamA || m.teamB).map((m, index) => ({
                 fields: {
-                    matchOrder: index + 1,
-                    teamA: m.teamA || '',
-                    teamB: m.teamB || ''
+                    ordercode: `第${index + 1}场: ${m.teamA || '轮空晋级'} VS ${m.teamB || '轮空晋级'}`
                 }
             }));
             
@@ -397,7 +395,7 @@
                 await new Promise(resolve => setTimeout(resolve, 500));
             }
             
-            statusEl.textContent = '赛程已保存到维格表！';
+            statusEl.textContent = '赛程已保存！';
             statusEl.className = 'status-text success';
         }
 
