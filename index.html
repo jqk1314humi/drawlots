@@ -13,134 +13,117 @@
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
             min-height: 100vh;
-            display: flex;
-            align-items: flex-start;
-            justify-content: center;
             background-image: url('微信图片_20260722115841_33385_1534.jpg');
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
             padding: 20px;
-            padding-top: 10vh;
+            padding-top: 8vh;
         }
-        .container {
-            background: rgba(255, 215, 0, 0.2);
-            backdrop-filter: blur(5px);
-            padding: 25px 20px;
-            border-radius: 16px;
-            box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
-            border: 2px solid rgba(255, 215, 0, 0.5);
+        .header {
             text-align: center;
-            max-width: 500px;
-            width: 100%;
-            animation: fadeInUp 0.6s ease-out;
-        }
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            margin-bottom: 30px;
         }
         h1 {
             color: #ffd700;
-            text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
-            margin-bottom: 25px;
-            font-size: 22px;
+            text-shadow: 0 0 15px rgba(255, 215, 0, 0.6);
+            font-size: 28px;
             font-weight: 700;
-            letter-spacing: -0.5px;
+            letter-spacing: 2px;
         }
-        .matches-grid {
+        .matches-container {
             display: flex;
             flex-direction: column;
-            gap: 15px;
-            max-height: 400px;
-            overflow-y: auto;
-            padding-right: 5px;
-            margin-bottom: 25px;
-        }
-        .matches-grid::-webkit-scrollbar {
-            width: 4px;
-        }
-        .matches-grid::-webkit-scrollbar-track {
-            background: rgba(0, 0, 0, 0.2);
-            border-radius: 2px;
-        }
-        .matches-grid::-webkit-scrollbar-thumb {
-            background: rgba(255, 215, 0, 0.5);
-            border-radius: 2px;
+            align-items: center;
+            gap: 20px;
+            padding-bottom: 100px;
         }
         .match-box {
-            background: rgba(0, 0, 0, 0.9);
-            border: 2px solid rgba(255, 215, 0, 0.3);
-            border-radius: 10px;
-            padding: 12px;
-            transition: all 0.3s ease;
+            background: rgba(0, 0, 0, 0.85);
+            border: 2px solid rgba(255, 215, 0, 0.4);
+            border-radius: 12px;
+            padding: 15px 30px;
+            min-width: 300px;
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+            transition: all 0.4s ease;
+            opacity: 0.5;
         }
         .match-box.filled {
+            opacity: 1;
             border-color: rgba(255, 215, 0, 0.8);
-            box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
         }
         .match-header {
-            font-size: 12px;
-            color: rgba(255, 215, 0, 0.6);
-            margin-bottom: 8px;
+            font-size: 14px;
+            color: rgba(255, 215, 0, 0.7);
+            margin-bottom: 12px;
             font-weight: 600;
-            letter-spacing: 1px;
+            letter-spacing: 2px;
         }
         .match-content {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 5px;
+            gap: 8px;
         }
         .team-name {
-            font-size: 18px;
+            font-size: 20px;
             color: #ffd700;
-            font-weight: 600;
-            min-height: 24px;
+            font-weight: 700;
+            min-height: 28px;
             display: flex;
             align-items: center;
             justify-content: center;
         }
         .vs {
-            font-size: 12px;
-            color: rgba(255, 215, 0, 0.5);
+            font-size: 14px;
+            color: rgba(255, 215, 0, 0.6);
             font-weight: 700;
-            letter-spacing: 2px;
+            letter-spacing: 3px;
+            padding: 5px 0;
         }
         .team-name.empty {
             color: rgba(255, 215, 0, 0.2);
             font-style: italic;
         }
-        .button-group {
+        .team-name.bye {
+            color: #4ade80;
+            background: rgba(74, 222, 128, 0.2);
+            padding: 4px 12px;
+            border-radius: 6px;
+        }
+        .button-area {
+            position: fixed;
+            bottom: 30px;
+            left: 0;
+            right: 0;
             display: flex;
-            gap: 10px;
             justify-content: center;
-            flex-wrap: wrap;
+            padding: 0 20px;
+            z-index: 100;
         }
         button {
             background: linear-gradient(135deg, #ffd700 0%, #daa520 100%);
             color: #1a1a1a;
             border: none;
-            padding: 12px 30px;
-            font-size: 14px;
-            font-weight: 600;
+            padding: 15px 45px;
+            font-size: 16px;
+            font-weight: 700;
             border-radius: 50px;
             cursor: pointer;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
-            letter-spacing: 0.5px;
+            box-shadow: 0 6px 20px rgba(255, 215, 0, 0.5);
+            letter-spacing: 2px;
+            min-width: 200px;
         }
-        button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(255, 215, 0, 0.5);
+        button:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(255, 215, 0, 0.6);
         }
-        button:active {
-            transform: translateY(0);
+        button:active:not(:disabled) {
+            transform: translateY(-1px);
         }
         button:disabled {
             background: linear-gradient(135deg, #a0aec0 0%, #718096 100%);
@@ -148,34 +131,43 @@
             cursor: not-allowed;
             transform: none;
         }
-        .status {
-            margin-top: 20px;
-            font-size: 14px;
+        .status-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
             padding: 12px 20px;
-            border-radius: 8px;
-            display: inline-block;
-            min-width: 200px;
+            background: rgba(0, 0, 0, 0.9);
+            border-bottom: 1px solid rgba(255, 215, 0, 0.3);
+            text-align: center;
+            z-index: 100;
         }
-        .error {
-            background-color: #fff5f5;
-            color: #c53030;
-            border: 1px solid #feb2b2;
+        .status-text {
+            font-size: 14px;
+            color: #ffd700;
+            font-weight: 500;
         }
-        .success {
-            background-color: #f0fff4;
-            color: #276749;
-            border: 1px solid #9ae6b4;
+        .status-text.error {
+            color: #ef4444;
+        }
+        .status-text.success {
+            color: #4ade80;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>寒江演武32进16抽签</h1>
-        <div class="matches-grid" id="matchesGrid"></div>
-        <div class="button-group">
-            <button id="generateBtn" onclick="drawMatches()" disabled>开始抽签</button>
-        </div>
-        <div class="status" id="status"></div>
+    <div class="status-bar">
+        <span class="status-text" id="status">正在加载数据...</span>
+    </div>
+    
+    <div class="header">
+        <h1>寒江演武抽签</h1>
+    </div>
+    
+    <div class="matches-container" id="matchesContainer"></div>
+    
+    <div class="button-area">
+        <button id="generateBtn" onclick="drawMatches()" disabled>开始抽签</button>
     </div>
 
     <script>
@@ -184,12 +176,12 @@
         const API_TOKEN = "uskNUrvWvJoD3VuQ5zW7GYH";
         const DATASHEET_ID = "dstkLYv4iqNWmnWAkz";
         const VIEW_ID = "viwilzoq1fHp3";
-        const TOTAL_MATCHES = 20;
 
         async function loadRecords() {
             const statusEl = document.getElementById('status');
             const btnEl = document.getElementById('generateBtn');
             statusEl.textContent = '正在加载数据...';
+            statusEl.className = 'status-text';
             btnEl.disabled = true;
             
             try {
@@ -207,13 +199,14 @@
                 if (result.success) {
                     allRecords = result.data.records;
                     initMatches();
-                    statusEl.textContent = `已加载 ${allRecords.length} 个参赛选手，共 ${TOTAL_MATCHES} 场比赛`;
-                    statusEl.className = 'status success';
+                    const totalMatches = Math.ceil(allRecords.length / 2);
+                    statusEl.textContent = `已加载 ${allRecords.length} 个参赛选手，共 ${totalMatches} 场比赛`;
+                    statusEl.className = 'status-text success';
                     if (allRecords.length >= 2) {
                         btnEl.disabled = false;
                     } else {
                         statusEl.textContent = '参赛选手不足，无法抽签';
-                        statusEl.className = 'status error';
+                        statusEl.className = 'status-text error';
                     }
                 } else {
                     throw new Error(result.message || '请求失败');
@@ -221,16 +214,18 @@
             } catch (error) {
                 console.error(error);
                 statusEl.textContent = `加载失败: ${error.message}`;
-                statusEl.className = 'status error';
+                statusEl.className = 'status-text error';
             }
         }
 
         function initMatches() {
             matches = [];
-            const grid = document.getElementById('matchesGrid');
-            grid.innerHTML = '';
+            const container = document.getElementById('matchesContainer');
+            container.innerHTML = '';
             
-            for (let i = 1; i <= TOTAL_MATCHES; i++) {
+            const totalMatches = Math.ceil(allRecords.length / 2);
+            
+            for (let i = 1; i <= totalMatches; i++) {
                 matches.push({
                     id: i,
                     teamA: null,
@@ -250,7 +245,7 @@
                         <div class="team-name empty">等待抽签</div>
                     </div>
                 `;
-                grid.appendChild(box);
+                container.appendChild(box);
             }
         }
 
@@ -291,41 +286,53 @@
             
             btnEl.disabled = true;
             statusEl.textContent = '正在抽签，请稍候...';
-            statusEl.className = 'status';
+            statusEl.className = 'status-text';
             
             if (allRecords.length < 2) {
                 statusEl.textContent = '参赛选手不足，无法抽签';
-                statusEl.className = 'status error';
+                statusEl.className = 'status-text error';
                 return;
             }
             
             try {
                 const shuffledRecords = shuffleArray(allRecords);
                 const recordsToDelete = [];
+                const totalMatches = matches.length;
                 
-                for (let i = 0; i < TOTAL_MATCHES && i * 2 + 1 < shuffledRecords.length; i++) {
+                for (let i = 0; i < totalMatches; i++) {
                     const recordA = shuffledRecords[i * 2];
                     const recordB = shuffledRecords[i * 2 + 1];
                     
-                    matches[i].teamA = recordA.fields['order'];
-                    matches[i].teamB = recordB.fields['order'];
-                    matches[i].teamARecordId = recordA.recordId;
-                    matches[i].teamBRecordId = recordB.recordId;
+                    if (recordA) {
+                        matches[i].teamA = recordA.fields['order'];
+                        matches[i].teamARecordId = recordA.recordId;
+                        recordsToDelete.push(recordA.recordId);
+                    }
                     
-                    recordsToDelete.push(recordA.recordId, recordB.recordId);
+                    if (recordB) {
+                        matches[i].teamB = recordB.fields['order'];
+                        matches[i].teamBRecordId = recordB.recordId;
+                        recordsToDelete.push(recordB.recordId);
+                    }
                     
                     const box = document.getElementById(`match-${i + 1}`);
                     if (box) {
                         box.className = 'match-box filled';
                         const content = box.querySelector('.match-content');
+                        
+                        const teamAClass = matches[i].teamA ? '' : 'bye';
+                        const teamAText = matches[i].teamA || '轮空晋级';
+                        const teamBClass = matches[i].teamB ? '' : 'bye';
+                        const teamBText = matches[i].teamB || '轮空晋级';
+                        
                         content.innerHTML = `
-                            <div class="team-name">${matches[i].teamA || '未知'}</div>
+                            <div class="team-name ${teamAClass}">${teamAText}</div>
                             <div class="vs">VS</div>
-                            <div class="team-name">${matches[i].teamB || '未知'}</div>
+                            <div class="team-name ${teamBClass}">${teamBText}</div>
                         `;
                     }
                     
-                    await new Promise(resolve => setTimeout(resolve, 500));
+                    await new Promise(resolve => setTimeout(resolve, 600));
                 }
                 
                 statusEl.textContent = '抽签完成，正在更新数据...';
@@ -341,13 +348,13 @@
                 }
                 
                 allRecords = allRecords.filter(r => !recordsToDelete.includes(r.recordId));
-                const filledCount = matches.filter(m => m.teamA && m.teamB).length;
+                const filledCount = matches.filter(m => m.teamA || m.teamB).length;
                 statusEl.textContent = `抽签完成！共生成 ${filledCount} 场比赛，剩余 ${allRecords.length} 个选手`;
-                statusEl.className = 'status success';
+                statusEl.className = 'status-text success';
             } catch (error) {
                 console.error(error);
                 statusEl.textContent = `抽签失败: ${error.message}`;
-                statusEl.className = 'status error';
+                statusEl.className = 'status-text error';
             }
         }
 
