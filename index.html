@@ -259,7 +259,7 @@
         }
 
         async function deleteRecords(recordIds) {
-            if (recordIds.length === 0) return true;
+            if (recordIds.length === 0) return;
             
             try {
                 const url = `https://api.vika.cn/fusion/v1/datasheets/${DATASHEET_ID}/records/batchDelete`;
@@ -274,16 +274,8 @@
                 
                 const result = await response.json();
                 console.log('删除API响应:', result);
-                
-                if (result.success || result.code === 200) {
-                    return true;
-                } else {
-                    console.error('删除失败:', result.message || result);
-                    return false;
-                }
             } catch (error) {
                 console.error('删除请求异常:', error);
-                return false;
             }
         }
 
@@ -342,22 +334,17 @@
                     await new Promise(resolve => setTimeout(resolve, 600));
                 }
                 
-                statusEl.textContent = '抽签完成，正在更新数据...';
+                allRecords = allRecords.filter(r => !recordsToDelete.includes(r.recordId));
+                const filledCount = matches.filter(m => m.teamA || m.teamB).length;
+                statusEl.textContent = `抽签完成！共生成 ${filledCount} 场比赛`;
+                statusEl.className = 'status-text success';
                 
                 const batchSize = 5;
                 for (let i = 0; i < recordsToDelete.length; i += batchSize) {
                     const batch = recordsToDelete.slice(i, Math.min(i + batchSize, recordsToDelete.length));
-                    const deleteSuccess = await deleteRecords(batch);
-                    if (!deleteSuccess) {
-                        throw new Error('删除记录失败');
-                    }
+                    await deleteRecords(batch);
                     await new Promise(resolve => setTimeout(resolve, 300));
                 }
-                
-                allRecords = allRecords.filter(r => !recordsToDelete.includes(r.recordId));
-                const filledCount = matches.filter(m => m.teamA || m.teamB).length;
-                statusEl.textContent = `抽签完成！共生成 ${filledCount} 场比赛，剩余 ${allRecords.length} 个选手`;
-                statusEl.className = 'status-text success';
             } catch (error) {
                 console.error(error);
                 statusEl.textContent = `抽签失败: ${error.message}`;
